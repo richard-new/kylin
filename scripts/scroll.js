@@ -8,16 +8,38 @@
   Scroller.prototype.init = function(iframes){
     this.data = [];
     var currentScroller = this;
+	var tempData = [];
 
     // create a player for each of the videos.
     iframes.each($.proxy(function(i, elem){
       var $elem = $(elem);
-      var videoId = $elem.attr("id");
-	  
-	  var player = videojs(videoId);
+      var videoId = $elem.attr("id");	  
+      var t = $elem.offset().top,
+        b = t + $elem.height();
+
+      tempData.push({
+        top: t,
+        bottom: b,
+        $elem: $elem,
+        player: player
+      });
+
+	  var player = videojs(videoId);	  
+	  	  
 	  // when the player is ready, add it to the rotatation
 	  videojs(videoId).ready(function () {
-   	    this.muted = false;
+	     var videoId = $elem.attr("id");
+
+	     for(let i = 0; i < tempData.length; i++) {
+			var newElem = tempData[i].$elem;
+			var newVideoId = newElem.attr("id")
+			if (videoId == newVideoId) {
+   			  currentScroller.add(tempData[i].top,tempData[i].bottom,tempData[i].$elem,this); 
+   			  break;
+			}
+		 } 
+
+//    	    this.muted = false;
 //     	if (i == 0) {
 //    	    	this.play().then(function () {
 //   				// autoplay was successful!
@@ -28,7 +50,7 @@
 // 			});
 //     	}
 //  	    this.play()
-	    currentScroller.add($elem,this);
+// 	    currentScroller.add($elem,this);
 	  });		
     }, this));
 
@@ -37,13 +59,13 @@
   };
 
   // Add the elements positioning data.
-  Scroller.prototype.add = function($elem, player){
-    var t = $elem.offset().top,
-      b = t + $elem.height();
+  Scroller.prototype.add = function(top,bottom,$elem, player){
+//     var t = $elem.offset().top,
+//       b = t + $elem.height();
 
     this.data.push({
-      top: t,
-      bottom: b,
+      top: top,
+      bottom: bottom,
       $elem: $elem,
       player: player
     });
@@ -83,6 +105,7 @@
       return {
         p: p,
         t: obj.top,
+        elem: obj.$elem,
         player: obj.player
       };
     }).sort(function(a, b){
@@ -101,25 +124,10 @@
       }
       return 0;
     }), function(i, obj){
-
       // the first obj in the list should be the one we want to play, but
       // make sure it has at least a little inframe.
       if (i === 0 && obj.p > 0.25){
         obj.player.play();
-        
-              var videoId = obj.$elem.attr("id");
-              alert(videoId)
-
-//     	if (i == 0) {
-//    	    	this.play().then(function () {
-//   				// autoplay was successful!
-//   				alert("success");
-// 			}).catch(function (error) {
-//   				// do something if you want to handle or track this error
-//   				alert(error);
-// 			});
-//     	}
-        
       } else {
         // pause the rest.
         obj.player.pause();
