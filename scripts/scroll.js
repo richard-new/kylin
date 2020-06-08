@@ -106,6 +106,20 @@
       // make sure it has at least a little inframe.
       if (i === 0 && obj.p > 0.25){
         obj.player.play();
+        
+              var videoId = obj.$elem.attr("id");
+              alert(videoId)
+
+//     	if (i == 0) {
+//    	    	this.play().then(function () {
+//   				// autoplay was successful!
+//   				alert("success");
+// 			}).catch(function (error) {
+//   				// do something if you want to handle or track this error
+//   				alert(error);
+// 			});
+//     	}
+        
       } else {
         // pause the rest.
         obj.player.pause();
