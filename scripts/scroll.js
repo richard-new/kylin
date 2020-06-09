@@ -7,6 +7,7 @@
 
   Scroller.prototype.init = function(iframes){
     this.data = [];
+    this.currentIsFullscreen = false;
     var currentScroller = this;
 	var tempData = [];
 
@@ -16,6 +17,11 @@
       var videoId = $elem.attr("id");	  
       var t = $elem.offset().top,
         b = t + $elem.height();
+        
+//       console.log(videoId);
+//       console.log(t);
+//       console.log(b);
+//       console.log("-------------------------");
 
       tempData.push({
         top: t,
@@ -32,12 +38,25 @@
 
 	     for(let i = 0; i < tempData.length; i++) {
 			var newElem = tempData[i].$elem;
-			var newVideoId = newElem.attr("id")
+			var newVideoId = newElem.attr("id");
 			if (videoId == newVideoId) {
+//       console.log("===========================");
+//       console.log(newVideoId);
+//       console.log(tempData[i].top);
+//       console.log(tempData[i].bottom);
+//       console.log("===========================");
+			
    			  currentScroller.add(tempData[i].top,tempData[i].bottom,tempData[i].$elem,this); 
    			  break;
 			}
 		 } 
+		 
+		 this.on('fullscreenchange', function () {
+		   currentScroller.currentIsFullscreen = this.isFullscreen();
+// 	       console.log("````````````````````````````````````");
+// 		   console.log(this.isFullscreen())
+// 	       console.log("````````````````````````````````````");
+		 });
 
 //    	    this.muted = false;
 //     	if (i == 0) {
@@ -51,7 +70,8 @@
 //     	}
 //  	    this.play()
 // 	    currentScroller.add($elem,this);
-	  });		
+	  });
+	  		
     }, this));
 
     // Listen to the scroll events.
@@ -153,11 +173,17 @@
 
     // Listen to the scroll event.
     $window.on('scroll', $.proxy(function(){
-
       // Nothings ready yet.
       if (this.data.length === 0){
         return false;
       }
+      
+//       console.log(this.currentIsFullscreen);
+      if(this.currentIsFullscreen) {
+        return false;
+      }
+    
+//       console.log("start scroll");
 
       this.scrolled();
     }, this));
@@ -170,7 +196,7 @@
         return false;
       }
 
-      this.resized();
+//       this.resized();
     }, this));
   };
 
